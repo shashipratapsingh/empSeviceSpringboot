@@ -10,6 +10,6 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long bookId;
-    private String BookName;
+    private String bookName;
     private String description;
 }

@@ -12,7 +12,7 @@ public interface BookService {
 
     public List<Book> getAllBooks();
 
-    public Optional<Book> getBookById(int id);
+    public Optional<Book> getBookByBookId(long BookId);
     public Book updateBook(Book book);
     public String deleteBook(int id);
 }

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1")
@@ -48,6 +49,7 @@ public class EmployeeController {
        }
 
        return new ResponseEntity<>(this.employeeService.getEmp(id),HttpStatus.OK);
+        //return new ResponseEntity<>(this.p)
     }
 
     @PostMapping("/projects")
@@ -67,31 +69,29 @@ public class EmployeeController {
         List<Book> books = this.bookService.getAllBooks();
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
-    @GetMapping("books/{id}")
-    public ResponseEntity<Book> getBookById(int id) {
+    @GetMapping("/books/{bookId}")
+    public ResponseEntity<Optional<Book>> getBookById(@PathVariable long bookId) {
         try{
-            Book book=this.bookService.getBookById(id).get();
+            Optional<Book> book=this.bookService.getBookByBookId(bookId);
             return new ResponseEntity<>(book, HttpStatus.OK);
         }catch (BookNotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new BookNotFoundException("This is not found"+ bookId+"in the database");
         }
 
     }
-    @PatchMapping("update")
+    @PutMapping("/updates")
     public ResponseEntity<Book> updateBook(@RequestBody @Valid Book book) {
         try {
-            // Call the service to update the book
-            Book savedBook = this.bookService.updateBook(book);
-            return new ResponseEntity<>(savedBook, HttpStatus.OK);
+            Book updatedBook = bookService.updateBook(book);
+            return new ResponseEntity<>(updatedBook, HttpStatus.OK);
         } catch (BookNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // Return a 500 status for any other unexpected errors
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/remove/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable int id) {
         try {
             bookService.deleteBook(id); // Call the service to delete the book
@@ -102,12 +102,4 @@ public class EmployeeController {
             return new ResponseEntity<>("An error occurred while trying to delete the book.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-
-
-
-
-
 }

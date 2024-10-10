@@ -51,23 +51,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> getBookById(int id) {
-        Optional<Book> book= bookRepository.findById(id);
+    public Optional<Book> getBookByBookId(long bookId) {
+        Optional<Book> book= bookRepository.findById((int) bookId);
         if (book.isEmpty()){
-            throw new BookNotFoundException("This is not found"+ id+"in the database");
+            throw new BookNotFoundException("This is not found"+ bookId+"in the database");
         }
         return book;
     }
 
     @Override
     public Book updateBook(Book book) {
-        try {
-            // Save the updated book
-            return this.bookRepository.save(book);
-        } catch (Exception e) {
-            // Handle any errors during the update operation
-            throw new BookNotFoundException("An error occurred while updating the book. Please try again.");
+        Optional<Book> existingBook = bookRepository.findById(Math.toIntExact(book.getBookId()));
+        if (existingBook.isEmpty()) {
+            throw new BookNotFoundException("Book not found with ID: " + book.getBookId());
         }
+        return bookRepository.save(book);
     }
 
     @Override
