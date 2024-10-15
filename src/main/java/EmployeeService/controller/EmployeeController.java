@@ -1,5 +1,6 @@
 package EmployeeService.controller;
 
+import EmployeeService.configurations.KafkaProducerService;
 import EmployeeService.model.Book;
 import EmployeeService.model.Employee;
 import EmployeeService.model.Project;
@@ -58,12 +59,22 @@ public class EmployeeController {
         return new ResponseEntity<>(savedProject, HttpStatus.CREATED);
     }
 
-//book service for JUnit
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
+
+//Book Integrate Kafka Producer in Your Controller
     @PostMapping("/books")
     public ResponseEntity<Book> createBooks(@RequestBody @Valid Book book) {
-        Book books = this.bookService.addBook(book);
-        return new ResponseEntity<>(books, HttpStatus.CREATED);
+        try {
+            Book books = this.bookService.addBook(book);
+            kafkaProducerService.sendMessage("Book created: " + books.toString());
+            return new ResponseEntity<>(books, HttpStatus.CREATED);
+        }catch (BookNotFoundException e){
+            throw new RuntimeException("Failed to save Books: " + e.getMessage());
+        }
     }
+
+
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books = this.bookService.getAllBooks();
