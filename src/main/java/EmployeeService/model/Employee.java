@@ -19,4 +19,6 @@ public class Employee {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employeeDetails_id", referencedColumnName = "id")
     private EmployeeDetails details;
+
+
 }
